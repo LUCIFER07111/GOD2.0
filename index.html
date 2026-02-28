@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>glass · timer & music</title>
+    <!-- DotGothic16 font & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- external CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- BACKGROUND VIDEO -->
+    <video class="background-video" autoplay loop muted playsinline>
+        <source src="videos/background.mp4" type="video/mp4">
+    </video>
+
+    <!-- MAIN CARD -->
+    <div class="glass-card" id="mainCard">
+        <div class="header">
+            <div class="header-right">
+                <div class="fullscreen-btn" id="fullscreenBtn">
+                    <i class="fa-solid fa-expand"></i>
+                </div>
+                <div class="mode-toggle" id="modeToggle">
+                    <i class="fa-regular fa-clock"></i> <i class="fa-solid fa-hourglass"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLOCK MODE (includes all music options) -->
+        <div id="clockMode">
+            <div class="time" id="clock">00:00</div>
+            <div class="date" id="date">2026.02.27</div>
+
+            <!-- RAINY MOOD: only icon and play button (no highlight, no text) -->
+            <div class="rainy-section">
+                <i class="fa-solid fa-cloud-rain rainy-icon"></i>
+                <button class="rainy-play-btn" id="rainyPlayBtn">
+                    <i class="fa-regular fa-circle-play"></i> play
+                </button>
+            </div>
+
+            <!-- MUSIC OPTIONS (add music, playlist, playback) -->
+            <div class="music-options">
+                <label for="fileInput" class="file-input-label"><i class="fa-solid fa-plus"></i> add music</label>
+                <input type="file" id="fileInput" accept="audio/*" multiple>
+                <ul class="playlist-items" id="playlistItems"></ul>
+
+                <div class="music-controls" id="musicControls">
+                    <div class="current-song" id="currentSong">—</div>
+                    <div style="display: flex; gap: 0.8rem;">
+                        <div class="control-btn" id="prevBtn"><i class="fa-solid fa-backward-step"></i></div>
+                        <div class="control-btn" id="playPauseBtn"><i class="fa-regular fa-circle-play"></i></div>
+                        <div class="control-btn" id="nextBtn"><i class="fa-solid fa-forward-step"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMER/STOPWATCH MODE (hidden by default) -->
+        <div id="timerMode" style="display: none;">
+            <div class="mode-selector">
+                <button class="mode-btn active" id="timerModeBtn">TIMER</button>
+                <button class="mode-btn" id="stopwatchModeBtn">STOPWATCH</button>
+            </div>
+            <div class="timer-display" id="timerDisplay">05:00</div>
+            <div class="timer-controls" id="timerControls">
+                <!-- filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- hidden audio elements -->
+    <audio id="userAudio" style="display: none;"></audio>
+    <audio id="rainyAudio" loop style="display: none;"></audio>
+
+    <!-- external JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
