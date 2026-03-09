@@ -19,6 +19,118 @@
         if (!document.fullscreenElement) fsIcon.className = 'fa-solid fa-expand';
     });
 
+    // ---------- BACKGROUND VIDEO SWITCHING ----------
+    const bgVideo = document.querySelector('.background-video');
+    const videoSources = ['videos/bg1.mp4', 'videos/bg2.mp4', 'videos/bg3.mp4', 'videos/bg4.mp4'];
+    let currentVideoIndex = 0;
+
+    document.getElementById('videoSwitchBtn').addEventListener('click', () => {
+        currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+        bgVideo.src = videoSources[currentVideoIndex];
+        bgVideo.load();
+        bgVideo.play().catch(err => console.log('Video play failed:', err));
+    });
+
+    // Handle video error (skip to next if one fails)
+    bgVideo.addEventListener('error', () => {
+        console.warn('Video failed to load, trying next...');
+        currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+        bgVideo.src = videoSources[currentVideoIndex];
+        bgVideo.load();
+        bgVideo.play().catch(e => console.log(e));
+    });
+
+    // ---------- CLOCK STYLE SWITCHING ----------
+    const digitalClock = document.getElementById('clock');
+    const analogCanvas = document.getElementById('analogClock');
+    const ctx = analogCanvas.getContext('2d');
+    let clockStyle = 'digital'; // 'digital' or 'analog'
+
+    document.getElementById('clockStyleBtn').addEventListener('click', () => {
+        if (clockStyle === 'digital') {
+            clockStyle = 'analog';
+            digitalClock.style.display = 'none';
+            analogCanvas.style.display = 'block';
+        } else {
+            clockStyle = 'digital';
+            digitalClock.style.display = 'block';
+            analogCanvas.style.display = 'none';
+        }
+        // Redraw analog immediately if switching to it
+        if (clockStyle === 'analog') drawAnalogClock();
+    });
+
+    function drawAnalogClock() {
+        const now = new Date();
+        const hours = now.getHours() % 12;
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        const radius = analogCanvas.width / 2;
+        ctx.clearRect(0, 0, analogCanvas.width, analogCanvas.height);
+        ctx.save();
+        ctx.translate(radius, radius);
+
+        // Clock face
+        ctx.beginPath();
+        ctx.arc(0, 0, radius - 5, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fill();
+
+        // Hour markers
+        for (let i = 0; i < 12; i++) {
+            const angle = (i * 30) * Math.PI / 180;
+            const x1 = (radius - 15) * Math.sin(angle);
+            const y1 = -(radius - 15) * Math.cos(angle);
+            const x2 = (radius - 5) * Math.sin(angle);
+            const y2 = -(radius - 5) * Math.cos(angle);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = i % 3 === 0 ? 3 : 1.5;
+            ctx.stroke();
+        }
+
+        // Hour hand
+        const hourAngle = (hours * 30 + minutes * 0.5) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(40 * Math.sin(hourAngle), -40 * Math.cos(hourAngle));
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // Minute hand
+        const minuteAngle = (minutes * 6 + seconds * 0.1) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(60 * Math.sin(minuteAngle), -60 * Math.cos(minuteAngle));
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Second hand
+        const secondAngle = seconds * 6 * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(70 * Math.sin(secondAngle), -70 * Math.cos(secondAngle));
+        ctx.strokeStyle = '#ffaaaa';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Center dot
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+
+        ctx.restore();
+    }
+
     // ---------- RAINY MOOD AUDIO ----------
     const rainyPlayBtn = document.getElementById('rainyPlayBtn');
     const rainyAudio = document.getElementById('rainyAudio');
@@ -61,7 +173,6 @@
     let currentIndex = -1;
     let isPlaying = false;
 
-    // Show music controls if there are songs
     function updateControlsVisibility() {
         if (playlist.length > 0) {
             musicControls.classList.add('visible');
@@ -70,7 +181,6 @@
         }
     }
 
-    // Update playlist UI
     function renderPlaylist() {
         playlistItems.innerHTML = '';
         playlist.forEach((item, idx) => {
@@ -82,18 +192,15 @@
         updateControlsVisibility();
     }
 
-    // Play song at given index
     function playSong(index) {
         if (index < 0 || index >= playlist.length) return;
         if (currentIndex === index && userAudio.src) {
-            // same song: toggle play/pause
             if (isPlaying) {
                 userAudio.pause();
             } else {
                 userAudio.play().catch(e => console.log(e));
             }
         } else {
-            // new song
             currentIndex = index;
             const song = playlist[currentIndex];
             userAudio.src = song.url;
@@ -101,7 +208,6 @@
             userAudio.play().catch(e => console.log(e));
             currentSongSpan.textContent = song.name;
         }
-        // isPlaying will be updated by events
     }
 
     function updatePlayPauseIcon() {
@@ -114,7 +220,6 @@
         }
     }
 
-    // Play/pause click
     playPauseBtn.addEventListener('click', () => {
         if (playlist.length === 0) return;
         if (currentIndex === -1) {
@@ -128,7 +233,6 @@
         }
     });
 
-    // Previous
     prevBtn.addEventListener('click', () => {
         if (playlist.length === 0) return;
         let newIndex = currentIndex - 1;
@@ -136,7 +240,6 @@
         playSong(newIndex);
     });
 
-    // Next
     nextBtn.addEventListener('click', () => {
         if (playlist.length === 0) return;
         let newIndex = currentIndex + 1;
@@ -144,7 +247,6 @@
         playSong(newIndex);
     });
 
-    // When song ends, play next
     userAudio.addEventListener('ended', () => {
         if (playlist.length > 0) {
             let newIndex = currentIndex + 1;
@@ -156,7 +258,6 @@
         }
     });
 
-    // Update isPlaying on play/pause events
     userAudio.addEventListener('play', () => {
         isPlaying = true;
         updatePlayPauseIcon();
@@ -166,7 +267,6 @@
         updatePlayPauseIcon();
     });
 
-    // File input: add files to playlist
     fileInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
         files.forEach(file => {
@@ -174,11 +274,10 @@
             playlist.push({ name: file.name, url: url });
         });
         renderPlaylist();
-        // If nothing is playing, select the first song
         if (currentIndex === -1 && playlist.length > 0) {
             currentIndex = 0;
             currentSongSpan.textContent = playlist[0].name;
-            userAudio.src = playlist[0].url; // preload
+            userAudio.src = playlist[0].url;
         }
     });
 
@@ -215,9 +314,14 @@
         if (!is24Hour && hour.length === 1) hour = '0' + hour;
         const seconds = parseInt(second);
         const colon = (seconds % 2 === 0) ? ':' : ' ';
-        clockEl.innerText = hour + colon + minute;
+        digitalClock.innerText = hour + colon + minute;
         dateEl.innerText = `${year}.${month}.${day} ${weekday}`;
+
+        if (clockStyle === 'analog') {
+            drawAnalogClock();
+        }
     }
+
     clockEl.addEventListener('click', () => { is24Hour = !is24Hour; updateClockAndDate(); });
     setInterval(updateClockAndDate, 1000);
 
