@@ -13,7 +13,7 @@
 <body>
     <!-- BACKGROUND VIDEO -->
     <video class="background-video" autoplay loop muted playsinline>
-        <source src="videos/background.mp4" type="video/mp4">
+        <source src="videos/bg1.mp4" type="video/mp4">
     </video>
 
     <!-- MAIN CARD -->
@@ -23,6 +23,12 @@
                 <div class="fullscreen-btn" id="fullscreenBtn">
                     <i class="fa-solid fa-expand"></i>
                 </div>
+                <div class="video-switch-btn" id="videoSwitchBtn">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <div class="clock-style-btn" id="clockStyleBtn">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
                 <div class="mode-toggle" id="modeToggle">
                     <i class="fa-regular fa-clock"></i> <i class="fa-solid fa-hourglass"></i>
                 </div>
@@ -31,10 +37,13 @@
 
         <!-- CLOCK MODE (includes all music options) -->
         <div id="clockMode">
-            <div class="time" id="clock">00:00</div>
+            <div class="clock-container">
+                <div class="time" id="clock">00:00</div>
+                <canvas id="analogClock" width="200" height="200" style="display: none;"></canvas>
+            </div>
             <div class="date" id="date">2026.02.27</div>
 
-            <!-- RAINY MOOD: only icon and play button (no highlight, no text) -->
+            <!-- RAINY MOOD: only icon and play button -->
             <div class="rainy-section">
                 <i class="fa-solid fa-cloud-rain rainy-icon"></i>
                 <button class="rainy-play-btn" id="rainyPlayBtn">
@@ -42,7 +51,7 @@
                 </button>
             </div>
 
-            <!-- MUSIC OPTIONS (add music, playlist, playback) -->
+            <!-- MUSIC OPTIONS -->
             <div class="music-options">
                 <label for="fileInput" class="file-input-label"><i class="fa-solid fa-plus"></i> add music</label>
                 <input type="file" id="fileInput" accept="audio/*" multiple>
